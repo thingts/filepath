@@ -89,6 +89,11 @@ export class AbsolutePath extends PathBase<TJoinable> implements AbsolutePathOps
   /**
    * Compute the relative path from the given base path to this path.
    *
+   * If the base path is not an ancestor of this path, the returned
+   * relative path will start with `..` segments to navigate up through a
+   * common ancestor.  If the base path is the same as this path, the
+   * returned relative path will be `.`.
+   *
    * @param base - The base absolute path.
    * @returns A {@link RelativePath} that goes from `base` to `this`.
    *
@@ -98,6 +103,12 @@ export class AbsolutePath extends PathBase<TJoinable> implements AbsolutePathOps
    * const p2 = new AbsolutePath('/project/demo/src/index.ts')
    * const rel = p2.relativeTo(p1) // 'src/index.ts' (RelativePath)
    * p1.join(rel).equals(p2)       // true
+   *
+   * const p3 = new AbsolutePath('/project/demo/bin/doit')
+   * const rel2 = p3.relativeTo(p2) // '../../bin/doit' (RelativePath)
+   * p2.join(rel2).equals(p3)       // true
+   *
+   * const rel3 = p1.relativeTo(p1) // '.' (RelativePath)
    * ```
    */
   relativeTo(base: AbsolutePath): RelativePath {

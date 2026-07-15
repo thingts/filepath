@@ -27,12 +27,38 @@ describe('AbsolutePath', () => {
       expect(p1.equals('/foo/bar/A.txt/')).toBe(true)
     })
 
-    it('can extract relative path', () => {
-      const base = new AbsolutePath('/foo/bar')
-      const child = new AbsolutePath('/foo/bar/baz/qux.txt')
-      const relpath = child.relativeTo(base)
-      expect(relpath).toBeInstanceOf(RelativePath)
-      expect(String(relpath)).toBe('baz/qux.txt')
+    describe('relativeTo()', () => {
+      it('extracts relative path to descendant', () => {
+        const base = new AbsolutePath('/foo/bar')
+        const child = new AbsolutePath('/foo/bar/baz/qux.txt')
+        const relpath = child.relativeTo(base)
+        expect(relpath).toBeInstanceOf(RelativePath)
+        expect(String(relpath)).toBe('baz/qux.txt')
+      })
+
+      it('extracts relative path to ancestor', () => {
+        const base = new AbsolutePath('/foo/bar/baz/qux')
+        const child = new AbsolutePath('/foo/bar')
+        const relpath = child.relativeTo(base)
+        expect(relpath).toBeInstanceOf(RelativePath)
+        expect(String(relpath)).toBe('../..')
+      })
+
+      it('extracts relative path to a different branch', () => {
+        const base = new AbsolutePath('/foo/bar/baz')
+        const child = new AbsolutePath('/foo/qux/quux.txt')
+        const relpath = child.relativeTo(base)
+        expect(relpath).toBeInstanceOf(RelativePath)
+        expect(String(relpath)).toBe('../../qux/quux.txt')
+      })
+
+      it('returns empty relative path if paths are equal', () => {
+        const base = new AbsolutePath('/foo/bar/baz')
+        const child = new AbsolutePath('/foo/bar/baz')
+        const relpath = child.relativeTo(base)
+        expect(relpath).toBeInstanceOf(RelativePath)
+        expect(String(relpath)).toBe('.')
+      })
     })
 
     describe('descendsFrom()', () => {
